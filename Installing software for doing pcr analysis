@@ -1,0 +1,20 @@
+#Ok to install biocManager first need some other software
+#glib
+#pkg-config
+#GTK
+#Rgtk2
+#suggested to use homebrew.
+
+#in shell
+brew install glib
+brew install pkg-config.
+brew install gtk+3
+brew install RGtk2
+brew install libgit2
+install.packages("cowplot")
+#in R
+install.packages("devtools")
+install.packages('pcr')
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+BiocManager::install("EasyqpcR", version = "3.8")
