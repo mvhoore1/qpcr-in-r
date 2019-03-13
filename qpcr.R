@@ -1,3 +1,9 @@
+#we need to load the package
+library(pcr)
+library(ggplot2)
+library(cowplot)
+
+
 # In the tutorial they added the samples-names by hand, I made it now that it will just take the first row from the excel sheet and use this as for samples
 qPCR = read.csv("qPCR.csv", header = TRUE)
 samples <- as.character(qPCR[,1])
