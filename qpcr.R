@@ -1,5 +1,6 @@
 # library
 suppressPackageStartupMessages(library(tidyverse))
+suppressPackageStartupMessages(library(RColorBrewer))
 
 # In the tutorial they added the samples-names by hand, I made it now that it will just take the first row from the excel sheet and use this as for samples
 qpcr = read.delim("qpcr-mock-data.tsv", header = TRUE,stringsAsFactors = F)
@@ -32,6 +33,14 @@ qpcr.with.ref.values = dplyr::left_join(x = qpcr,y = reference_values,by="unique
 qpcr.with.ref.values = mutate(qpcr.with.ref.values,delta.ct=exp_ct_vals / avg_reference)
 head(qpcr.with.ref.values)
 
+# plot the technical replicates distances
+# qpcr.with.ref.values %>%  
+#   ggplot(aes(x=biol_rep.x,y=delta.ct,color=as.factor(techinical.replicat))) + 
+#   geom_point() + 
+#   geom_line(group=biol_rep.x) +
+#   scale_y_log10() +
+#   facet_wrap( ~ gene.x + xp_factor.x)
+
 ################################################
 # Average the technical replicates for all genes
 ################################################
@@ -39,6 +48,15 @@ qpcr.with.ref.values.avg = qpcr.with.ref.values %>%
   group_by(xp_factor.x,biol_rep.x,gene.x) %>%
   summarise(avg_tech = mean(delta.ct))
 
-
+# plot per xp_factor and facet per gene
+qpcr.with.ref.values.avg %>% 
+    ggplot(aes(x=xp_factor.x,y=avg_tech,fill=gene.x)) +
+  geom_boxplot() +
+  geom_point() +
+  scale_y_log10() +
+  facet_wrap(~ gene.x) +
+  scale_color_brewer(palette = "Set2") +
+  labs(x = "Experimental condition",y="Normalised expression (AU)") +
+  theme(axis.text= element_text(color="black"))
 
 
