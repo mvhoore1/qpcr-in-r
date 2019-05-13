@@ -12,16 +12,40 @@ qpcr$unique_id = paste(qpcr$xp_factor,qpcr$biol_rep,sep = "_")
 # this "2" should be able to change at some point because different primers will have different effciencies. However this is only important when you compare different primers/genes with each other in absolute terms
 qpcr = mutate(qpcr,exp_ct_vals=2^-ct_vals)
 
+#######################################################
+# Finding possible outliers among biological replicates 
+#######################################################
+
+# calculate the spread among technical replicates within one sample
+
+# if one technical replicate is far away from the others, there's an issue with that sample
+# calculate the standard deviation based on all technical replicates
+# if one is too far away (e.g. +-2SD or +-3SD) then it should be removed
+# remove that technical replicate 
+
+# plot the variation among technical replicates per sample
+qpcr %>% 
+  ggplot(aes(unique_id,exp_ct_vals)) + 
+  geom_boxplot() +
+  geom_point() +
+  facet_wrap(~ gene)
+
 ##########################################################
 # average the technical replicates of the reference genes
 #########################################################
+
 reference_values = qpcr %>% 
   filter(gene_type == "reference") %>% 
   group_by(xp_factor,biol_rep,gene) %>%
   summarise(avg_reference = mean(exp_ct_vals))
 
 # assigning a unique identifier for left_join
+# we add the sample unique identifier to be able to combine the reference gene Ct values with the target genes Ct values
+# making sure that reference genes Ct values are next to 
 reference_values$unique_id = paste(reference_values$xp_factor,reference_values$biol_rep,sep="_") 
+
+# simplifying the reference_values dataframe
+reference_values = reference_values[,c("avg_reference","unique_id")]
 
 #########################################
 # Left join to add the reference Ct value
